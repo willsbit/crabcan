@@ -3,7 +3,9 @@ use std::process::exit;
 
 #[derive(Debug)]
 // Contains all possible errors in the CLI tool
-pub enum Errcode {}
+pub enum Errcode {
+    ArgumentInvalid(&'static str),
+}
 
 #[allow(unreachable_patterns)]
 // trait Display, allows Errcode enum to be displayed by:
@@ -12,6 +14,7 @@ pub enum Errcode {}
 impl fmt::Display for Errcode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self {
+            Errcode::ArgumentInvalid(element) => write!(f, "ArgumentInvalid: {}", element),
             _ => write!(f, "{:?}", self),
         }
     }
