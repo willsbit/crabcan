@@ -1,3 +1,6 @@
+use nix::errno::Errno;
+use nix::sys::utsname::uname;
+
 use crate::cli::Args;
 use crate::config::ContainerOpts;
 use crate::errors::Errcode;
@@ -25,6 +28,7 @@ impl Container {
 }
 
 pub fn start(args: Args) -> Result<(), Errcode> {
+    check_linux_version()?;
     let mut container = Container::new(args)?;
 
     if let Err(e) = container.create() {
@@ -35,4 +39,28 @@ pub fn start(args: Args) -> Result<(), Errcode> {
 
     log::debug!("Finished, cleaning & exit");
     container.clean_exit()
+}
+
+
+/// Get system information and check for kernel version
+pub const MINIMAL_KERNEL_VERSION: f32 = 4.8;
+
+pub fn check_linux_version() -> Result<(), Errcode> {
+    let host = uname().unwrap();
+    
+    log::debug!("Linux release: {:?}", host.release());
+
+    if let Ok(version) = scan_fmt!(host.release().to_str().ok_or(Errcode::ContainerError(0))?, "{f}.{}", f32) {
+        if version < MINIMAL_KERNEL_VERSION {
+            return Err(Errcode::NotSupported(0));
+        }
+    } else {
+        return Err(Errcode::ContainerError(0));
+    }
+
+    if host.machine() != "x86_64" {
+        return Err(Errcode::NotSupported(1));
+    }
+
+    Ok(())
 }

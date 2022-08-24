@@ -4,6 +4,8 @@ use std::process::exit;
 #[derive(Debug)]
 // Contains all possible errors in the CLI tool
 pub enum Errcode {
+    ContainerError(u8),
+    NotSupported(u8),
     ArgumentInvalid(&'static str),
 }
 
@@ -14,7 +16,10 @@ pub enum Errcode {
 impl fmt::Display for Errcode {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match &self {
+            Errcode::ContainerError(element) => write!(f, "ContainerError: {}", element),
+            Errcode::NotSupported(element) => write!(f, "NotSupported: {}", element),
             Errcode::ArgumentInvalid(element) => write!(f, "ArgumentInvalid: {}", element),
+
             _ => write!(f, "{:?}", self),
         }
     }
