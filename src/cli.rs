@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use structopt::StructOpt;
 
-use crate::errors::{Errcode};
+use crate::errors::Errcode;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "crabcan", about = "A simple container in Rust.")]
@@ -16,7 +16,7 @@ pub struct Args {
 
     /// User ID to create inside the container
     #[structopt(short, long)]
-    pub uid: i32,
+    pub uid: u32,
 
     /// Directory to mount as root of the container
     #[structopt(parse(from_os_str), short = "m", long = "mount")]
